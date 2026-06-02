@@ -1,0 +1,27 @@
+# Example configuration for Structure Heatmap.
+# Copy this file to `.sheatrc` and adjust the values for your project.
+
+# Directory or file to analyze.
+target = .
+
+# Output format: markdown, json, or html.
+format = html
+
+# Output file path.
+output = structure-report.html
+
+# Exclude patterns. Repeat `ignore` for multiple entries.
+ignore = node_modules
+ignore = dist
+
+# Hidden files and directories are excluded by default.
+include-hidden = false
+
+# Line counting mode: physical or sloc.
+line-mode = physical
+
+# Minimum ratio used to report hotspots.
+min-ratio = 3
+
+# Maximum directory depth to aggregate.
+max-depth = 5

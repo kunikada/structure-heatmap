@@ -1,0 +1,32 @@
+# Rust build artifacts
+/target/
+
+# Rust profiling and coverage output
+*.profraw
+*.profdata
+coverage/
+tarpaulin-report.html
+
+# Local configuration
+.sheatrc
+.sheatrc.*
+!.sheatrc.example
+
+# Generated reports
+structure-report.*
+
+# AI tool directories
+.claude/
+.agents/
+.codex/
+
+# Editor and OS files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+
