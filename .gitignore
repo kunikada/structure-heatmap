@@ -11,6 +11,7 @@ tarpaulin-report.html
 .sheatrc
 .sheatrc.*
 !.sheatrc.example
+!tests/**/.sheatrc
 
 # Generated reports
 structure-report.*
