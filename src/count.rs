@@ -49,24 +49,24 @@ fn has_code(mut s: &str, syn: &CommentSyntax) -> bool {
             return false;
         }
         // A line-comment prefix terminates the scan — nothing after it is code.
-        if let Some(lp) = syn.line {
-            if s.starts_with(lp) {
-                return false;
-            }
+        if let Some(lp) = syn.line
+            && s.starts_with(lp)
+        {
+            return false;
         }
         // Strip a leading block comment if one opens here.
-        if let Some((open, close)) = syn.block {
-            if s.starts_with(open) {
-                match s[open.len()..].find(close) {
-                    Some(rel) => {
-                        // Block opens and closes — advance past the closing delimiter.
-                        s = &s[open.len() + rel + close.len()..];
-                        continue;
-                    }
-                    None => {
-                        // Block opens but never closes on this segment — no code.
-                        return false;
-                    }
+        if let Some((open, close)) = syn.block
+            && s.starts_with(open)
+        {
+            match s[open.len()..].find(close) {
+                Some(rel) => {
+                    // Block opens and closes — advance past the closing delimiter.
+                    s = &s[open.len() + rel + close.len()..];
+                    continue;
+                }
+                None => {
+                    // Block opens but never closes on this segment — no code.
+                    return false;
                 }
             }
         }
@@ -112,7 +112,7 @@ fn count_sloc_with_syntax(text: &str, syn: CommentSyntax) -> usize {
 
         match (line_pos, block_open_pos) {
             // Line comment comes first (or there is no block open).
-            (Some(lp), block_op) if block_op.map_or(true, |bp| lp <= bp) => {
+            (Some(lp), block_op) if block_op.is_none_or(|bp| lp <= bp) => {
                 // Everything before the line comment prefix is code.
                 if trimmed[..lp].trim().is_empty() {
                     // Pure line-comment line.
@@ -167,12 +167,13 @@ struct CommentSyntax {
 /// Returns comment syntax for a recognized extension, or `None` for unknown ones.
 fn comment_syntax(ext: &str) -> Option<CommentSyntax> {
     Some(match ext {
-        "rs" | "c" | "cpp" | "cc" | "cxx" | "h" | "hpp" | "java" | "js" | "jsx" | "ts"
-        | "tsx" | "cs" | "go" | "swift" | "kt" | "kts" | "scala" | "dart" | "groovy"
-        | "gradle" => CommentSyntax {
-            line: Some("//"),
-            block: Some(("/*", "*/")),
-        },
+        "rs" | "c" | "cpp" | "cc" | "cxx" | "h" | "hpp" | "java" | "js" | "jsx" | "ts" | "tsx"
+        | "cs" | "go" | "swift" | "kt" | "kts" | "scala" | "dart" | "groovy" | "gradle" => {
+            CommentSyntax {
+                line: Some("//"),
+                block: Some(("/*", "*/")),
+            }
+        }
         "css" | "scss" | "sass" | "less" => CommentSyntax {
             line: None,
             block: Some(("/*", "*/")),
