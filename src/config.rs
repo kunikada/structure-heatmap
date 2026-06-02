@@ -67,7 +67,15 @@ impl Default for Config {
 pub fn load_config_file(path: &std::path::Path) -> Result<FileConfig, String> {
     let content = std::fs::read_to_string(path)
         .map_err(|e| format!("cannot read config file {}: {}", path.display(), e))?;
-    parse_config_file(&content)
+    let base = path.parent().unwrap_or(std::path::Path::new("."));
+    let mut fc = parse_config_file(&content)?;
+    if let Some(t) = fc.target {
+        fc.target = Some(base.join(t));
+    }
+    if let Some(o) = fc.output {
+        fc.output = Some(base.join(o));
+    }
+    Ok(fc)
 }
 
 #[derive(Debug, Default)]
@@ -185,5 +193,28 @@ mod tests {
     fn parse_comments_and_blank_lines() {
         let cfg = parse_config_file("# comment\n\nformat = html\n").unwrap();
         assert!(matches!(cfg.format, Some(Format::Html)));
+    }
+
+    #[test]
+    fn load_config_file_resolves_target_relative_to_config_dir() {
+        let dir = tempfile::tempdir().unwrap();
+        let config_path = dir.path().join(".sheatrc");
+        std::fs::write(&config_path, "target = subdir\noutput = out.html\n").unwrap();
+
+        let fc = load_config_file(&config_path).unwrap();
+        assert_eq!(fc.target, Some(dir.path().join("subdir")));
+        assert_eq!(fc.output, Some(dir.path().join("out.html")));
+    }
+
+    #[test]
+    fn load_config_file_without_paths_leaves_them_none() {
+        let dir = tempfile::tempdir().unwrap();
+        let config_path = dir.path().join(".sheatrc");
+        std::fs::write(&config_path, "min-ratio = 5\n").unwrap();
+
+        let fc = load_config_file(&config_path).unwrap();
+        assert_eq!(fc.target, None);
+        assert_eq!(fc.output, None);
+        assert_eq!(fc.min_ratio, Some(5.0));
     }
 }

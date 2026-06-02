@@ -199,6 +199,24 @@ fn cli_overrides_config_file() {
     );
 }
 
+#[test]
+fn config_file_target_is_resolved_relative_to_config() {
+    // .sheatrc contains `target = ../basic` — must resolve relative to the config file,
+    // not to cwd, so this must work regardless of where the test binary runs.
+    let config_path = fixture_dir("with_config_target").join(".sheatrc");
+    let out = sheat().arg("--config").arg(&config_path).output().unwrap();
+    assert!(
+        out.status.success(),
+        "stderr: {}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    let stdout = String::from_utf8_lossy(&out.stdout);
+    assert!(
+        stdout.contains("Directory Summary"),
+        "expected output from basic fixture via config target:\n{stdout}"
+    );
+}
+
 // --- error handling ---
 
 #[test]
