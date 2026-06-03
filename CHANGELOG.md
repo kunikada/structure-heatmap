@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1 - 2026-06-03
+
+### Changed
+
+- Updated the CLI help message.
+
 ## 0.1.0 - 2026-06-02
 
 Initial beta release.

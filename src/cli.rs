@@ -4,41 +4,41 @@ use std::path::PathBuf;
 #[derive(Parser, Debug)]
 #[command(
     name = "sheat",
-    about = "Structure Heatmap: visualize file size distribution in a codebase"
+    about = "Count lines per file/directory and flag hotspots that are disproportionately large"
 )]
 pub struct Cli {
-    /// Directory or file to analyze
+    /// Root directory or file to analyze (falls back to target in .sheatrc)
     pub target: Option<PathBuf>,
 
-    /// Output format: markdown, json, or html
+    /// Output format [default: markdown] [possible values: markdown, json, html]
     #[arg(long, value_name = "FORMAT")]
     pub format: Option<String>,
 
-    /// Write output to this file (default: stdout)
+    /// Write output to this file instead of stdout
     #[arg(long, value_name = "PATH")]
     pub output: Option<PathBuf>,
 
-    /// Exclude paths matching this pattern (repeatable)
+    /// Glob pattern to exclude paths (repeatable)
     #[arg(long = "ignore", value_name = "PATTERN")]
     pub ignore: Vec<String>,
 
-    /// Include hidden files and directories
+    /// Include dot-files and dot-directories
     #[arg(long)]
     pub include_hidden: bool,
 
-    /// Line counting mode: physical or sloc
+    /// How to count lines [default: physical] [possible values: physical (all lines), sloc (skip blank lines and comments)]
     #[arg(long, value_name = "MODE")]
     pub line_mode: Option<String>,
 
-    /// Minimum ratio to report a hotspot
+    /// Flag a file/directory as a hotspot if its line count is at least N times the median of its siblings [default: 3]
     #[arg(long, value_name = "NUMBER")]
     pub min_ratio: Option<f64>,
 
-    /// Maximum directory depth to aggregate
+    /// Aggregate directories deeper than this level into their parent [default: unlimited]
     #[arg(long, value_name = "NUMBER")]
     pub max_depth: Option<usize>,
 
-    /// Path to configuration file
+    /// Load settings from this file instead of the default .sheatrc
     #[arg(long, value_name = "PATH")]
     pub config: Option<PathBuf>,
 }
